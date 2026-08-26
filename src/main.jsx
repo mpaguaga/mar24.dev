@@ -30,12 +30,13 @@ function App() {
         <section className="intro">
           <span className="eyebrow reveal d1"><i className="statusDot" />Software · Systems · Product</span>
           <h1 className="reveal d2">
-            I build useful<br />
-            <span>digital things.</span>
+            Design.<br />
+            Build.<br />
+            <span>Ship.</span>
           </h1>
           <p className="introText reveal d3">
-            Software, automation and products designed to solve real problems —
-            without making things unnecessarily complicated.
+            Software, automation and systems — engineered to be fast, clean and
+            genuinely useful.
           </p>
           <div className="introCtas reveal d4">
             <a href="#work" className="btn btnPrimary">View work ↗</a>
