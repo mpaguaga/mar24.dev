@@ -39,6 +39,29 @@ function App() {
     return () => io.disconnect();
   }, []);
 
+  // Magnetic buttons — gently pull toward the cursor
+  useEffect(() => {
+    const magnets = document.querySelectorAll(".btn");
+    const strength = 22;
+    const handlers = [];
+    magnets.forEach((mag) => {
+      const move = (e) => {
+        const r = mag.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width - 0.5) * strength;
+        const y = ((e.clientY - r.top) / r.height - 0.5) * strength;
+        mag.style.transform = `translate(${x}px, ${y}px)`;
+      };
+      const reset = () => { mag.style.transform = "translate(0,0)"; };
+      mag.addEventListener("pointermove", move);
+      mag.addEventListener("pointerleave", reset);
+      handlers.push({ mag, move, reset });
+    });
+    return () => handlers.forEach(({ mag, move, reset }) => {
+      mag.removeEventListener("pointermove", move);
+      mag.removeEventListener("pointerleave", reset);
+    });
+  }, []);
+
   return (
     <div className="app">
       <div className="progress" />
@@ -63,7 +86,7 @@ function App() {
           <h1 className="reveal d2">
             Design.<br />
             Build.<br />
-            <span>Ship.</span>
+            <span className="shimmer">Ship.</span>
           </h1>
           <p className="introText reveal d3">
             Software, automation and systems — engineered to be fast, clean and
@@ -79,7 +102,7 @@ function App() {
         <section className="work" id="work" data-reveal>
           <div className="sectionHeader">
             <span>Selected Work</span>
-            <span>01 / 01</span>
+            <span>01 / 02</span>
           </div>
 
           <a
@@ -117,6 +140,44 @@ function App() {
             <div className="projectFooter">
               <span>Public Build</span>
               <span>StreamPulse</span>
+            </div>
+          </a>
+
+          <a
+            className="projectCard"
+            href="https://github.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="projectTop">
+              <span className="projectNumber">02</span>
+              <span className="live soon"><i />In Progress</span>
+            </div>
+
+            <div className="projectContent">
+              <div>
+                <span className="projectMeta">Automation · Tooling · Node</span>
+                <h2>FlowKit</h2>
+                <p>
+                  A lightweight automation toolkit for onboarding, offboarding and
+                  identity workflows — turning repetitive tasks into one-click
+                  actions with a clean audit trail.
+                </p>
+                <div className="tags">
+                  <span className="tag">Node</span>
+                  <span className="tag">Automation</span>
+                  <span className="tag">IAM</span>
+                </div>
+              </div>
+              <div className="projectAction">
+                View project
+                <strong>↗</strong>
+              </div>
+            </div>
+
+            <div className="projectFooter">
+              <span>Private Build</span>
+              <span>FlowKit</span>
             </div>
           </a>
         </section>
