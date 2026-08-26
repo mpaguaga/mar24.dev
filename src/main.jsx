@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -9,8 +9,54 @@ const GitHubIcon = () => (
 );
 
 function App() {
+  const appRef = useRef(null);
+
+  // Cursor spotlight glow that follows the mouse
+  useEffect(() => {
+    const el = appRef.current;
+    if (!el) return;
+    const move = (e) => {
+      el.style.setProperty("--mx", `${e.clientX}px`);
+      el.style.setProperty("--my", `${e.clientY}px`);
+    };
+    window.addEventListener("pointermove", move);
+    return () => window.removeEventListener("pointermove", move);
+  }, []);
+
+  // Scroll progress bar
+  useEffect(() => {
+    const bar = document.querySelector(".progress");
+    const onScroll = () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      if (bar) bar.style.width = `${pct}%`;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Reveal sections as they enter the viewport
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("inview");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll("[data-reveal]").forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <div className="app">
+    <div className="app" ref={appRef}>
+      <div className="progress" />
+      <div className="spotlight" />
       <div className="ambient ambientOne" />
       <div className="ambient ambientTwo" />
       <div className="grain" />
@@ -45,7 +91,7 @@ function App() {
         </section>
 
         {/* Work */}
-        <section className="work" id="work">
+        <section className="work" id="work" data-reveal>
           <div className="sectionHeader">
             <span>Selected Work</span>
             <span>01 / 01</span>
@@ -91,7 +137,7 @@ function App() {
         </section>
 
         {/* About */}
-        <section className="about" id="about">
+        <section className="about" id="about" data-reveal>
           <div className="sectionHeader">
             <span>About</span>
             <span>Who I Am</span>
