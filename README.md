@@ -1,3 +1,3 @@
 # mar24.dev
 
-Personal builder portfolio. Vercel build command: `npm run build`; output: `dist`.
+Vercel: Framework Vite, Build `npm run build`, Output `dist`, Install `npm install`.
