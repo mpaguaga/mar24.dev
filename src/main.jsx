@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -8,7 +8,64 @@ const GitHubIcon = () => (
   </svg>
 );
 
+const SunIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+  </svg>
+);
+
+const TECH = ["React", "Node.js", "Automation", "Azure", "Linux", "Python", "REST APIs", "Identity", "SharePoint", "CI/CD"];
+
+// Animated count-up number
+function CountUp({ end, suffix = "", plus = false }) {
+  const [val, setVal] = useState(0);
+  const ref = React.useRef(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    let started = false;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !started) {
+          started = true;
+          const dur = 1300;
+          const t0 = performance.now();
+          const tick = (now) => {
+            const p = Math.min((now - t0) / dur, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setVal(Math.round(eased * end));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.5 });
+    io.observe(node);
+    return () => io.disconnect();
+  }, [end]);
+  return <b ref={ref}>{val}{plus ? "+" : ""}{suffix}</b>;
+}
+
 function App() {
+  const [theme, setTheme] = useState("dark");
+
+  // Apply + persist theme
+  useEffect(() => {
+    const saved = localStorage.getItem("mar24-theme");
+    if (saved) setTheme(saved);
+  }, []);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("mar24-theme", theme);
+  }, [theme]);
+
   // Scroll progress bar
   useEffect(() => {
     const bar = document.querySelector(".progress");
@@ -39,7 +96,7 @@ function App() {
     return () => io.disconnect();
   }, []);
 
-  // Magnetic buttons — gently pull toward the cursor
+  // Magnetic buttons
   useEffect(() => {
     const magnets = document.querySelectorAll(".btn");
     const strength = 22;
@@ -72,10 +129,17 @@ function App() {
       <header className="header">
         <a href="/" className="logo">MAR24<span>.DEV</span></a>
         <nav className="nav">
-          <a href="#work">Work</a>
-          <a href="#about">About</a>
-          <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="#work" className="navLink">Work</a>
+          <a href="#about" className="navLink">About</a>
+          <a href="https://github.com/" className="navLink" target="_blank" rel="noreferrer">GitHub</a>
           <a href="mailto:hello@mar24.dev" className="contact">Contact<span>↗</span></a>
+          <button
+            className="themeToggle"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          </button>
         </nav>
       </header>
 
@@ -97,7 +161,17 @@ function App() {
             <a href="mailto:hello@mar24.dev" className="btn btnGhost">Get in touch</a>
           </div>
         </section>
+      </main>
 
+      {/* Tech marquee (full width) */}
+      <div className="marquee reveal d5">
+        <div className="marqueeTrack">
+          <span>{TECH.join(" ")}</span>
+          <span>{TECH.join(" ")}</span>
+        </div>
+      </div>
+
+      <main className="main">
         {/* Work */}
         <section className="work" id="work" data-reveal>
           <div className="sectionHeader">
@@ -192,8 +266,8 @@ function App() {
             <div>
               <h2>Simple ideas.<br /><span>Well built.</span></h2>
               <div className="stats">
-                <div className="stat"><b>5+</b><span>Years</span></div>
-                <div className="stat"><b>20+</b><span>Projects</span></div>
+                <div className="stat"><CountUp end={5} plus /><span>Years</span></div>
+                <div className="stat"><CountUp end={20} plus /><span>Projects</span></div>
                 <div className="stat"><b>∞</b><span>Curiosity</span></div>
               </div>
             </div>
