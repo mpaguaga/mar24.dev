@@ -4,7 +4,7 @@ import "./styles.css";
 
 const GitHubIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M12 .7a11.3 11.3 0 0 0-3.57 22.02c.57.1.78-.25.78-.55v-2.16c-3.18.69-3.85-1.34-3.85-1.34-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.67 1.25 3.32.96.1-.74.4-1.25.72-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.13 1.17a10.9 10.9 0 0 1 5.7 0c2.17-1.48 3.13-1.17 3.13-1.17.62 1.57.23 2.73.11 3.02.73.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.36-5.23 5.64.41.35.77 1.04.77 2.1v3.12c0 .3.21.65.79.54A11.3 11.3 0 0 0 12 .7Z"/>
+    <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.4-1.27.73-1.56-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z" />
   </svg>
 );
 
@@ -13,42 +13,40 @@ function App() {
     <div className="app">
       <div className="ambient ambientOne" />
       <div className="ambient ambientTwo" />
+      <div className="grain" />
 
       <header className="header">
-        <a className="logo" href="/">MAR24<span>.</span>DEV</a>
-
+        <a href="/" className="logo">MAR24<span>.DEV</span></a>
         <nav className="nav">
           <a href="#work">Work</a>
           <a href="#about">About</a>
           <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="mailto:hello@mar24.dev" className="contact">Contact<span>↗</span></a>
         </nav>
-
-        <a className="contact" href="mailto:hello@mar24.dev">
-          Contact <span>↗</span>
-        </a>
       </header>
 
       <main className="main">
+        {/* Intro */}
         <section className="intro">
-          <div className="eyebrow">
-            <span className="statusDot" />
-            SOFTWARE · SYSTEMS · PRODUCT
-          </div>
-
-          <h1>
-            I build <span>useful</span><br />
-            digital things.
+          <span className="eyebrow reveal d1"><i className="statusDot" />Software · Systems · Product</span>
+          <h1 className="reveal d2">
+            I build useful<br />
+            <span>digital things.</span>
           </h1>
-
-          <p className="introText">
-            Software, automation and products designed to solve real problems
+          <p className="introText reveal d3">
+            Software, automation and products designed to solve real problems —
             without making things unnecessarily complicated.
           </p>
+          <div className="introCtas reveal d4">
+            <a href="#work" className="btn btnPrimary">View work ↗</a>
+            <a href="mailto:hello@mar24.dev" className="btn btnGhost">Get in touch</a>
+          </div>
         </section>
 
-        <section id="work" className="work">
+        {/* Work */}
+        <section className="work" id="work">
           <div className="sectionHeader">
-            <span>SELECTED WORK</span>
+            <span>Selected Work</span>
             <span>01 / 01</span>
           </div>
 
@@ -60,44 +58,56 @@ function App() {
           >
             <div className="projectTop">
               <span className="projectNumber">01</span>
-              <span className="live"><i /> LIVE</span>
+              <span className="live"><i />Live</span>
             </div>
 
             <div className="projectContent">
               <div>
-                <div className="projectMeta">SAAS · STREAMING · REACT</div>
+                <span className="projectMeta">SaaS · Streaming · React</span>
                 <h2>StreamPulse</h2>
                 <p>
                   A modern streaming companion for creators — bringing stream
-                  controls, OBS connectivity and live system information into
-                  one clean interface.
+                  controls, OBS connectivity and live system information into one
+                  clean interface.
                 </p>
+                <div className="tags">
+                  <span className="tag">React</span>
+                  <span className="tag">OBS</span>
+                  <span className="tag">Realtime</span>
+                </div>
               </div>
-
               <div className="projectAction">
-                <span>VIEW PROJECT</span>
+                View project
                 <strong>↗</strong>
               </div>
             </div>
 
             <div className="projectFooter">
-              <span>PUBLIC BUILD</span>
-              <span>STREAMPULSE</span>
+              <span>Public Build</span>
+              <span>StreamPulse</span>
             </div>
           </a>
         </section>
 
-        <section id="about" className="about">
+        {/* About */}
+        <section className="about" id="about">
           <div className="sectionHeader">
-            <span>ABOUT</span>
+            <span>About</span>
+            <span>Who I Am</span>
           </div>
-
           <div className="aboutGrid">
-            <h2>Simple ideas.<br /><span>Well built.</span></h2>
+            <div>
+              <h2>Simple ideas.<br /><span>Well built.</span></h2>
+              <div className="stats">
+                <div className="stat"><b>5+</b><span>Years</span></div>
+                <div className="stat"><b>20+</b><span>Projects</span></div>
+                <div className="stat"><b>∞</b><span>Curiosity</span></div>
+              </div>
+            </div>
             <p>
-              I enjoy turning ideas into software people can actually use.
-              My work sits between systems, automation, product and interface
-              design — with a focus on keeping complicated things simple.
+              I enjoy turning ideas into software people can actually use. My work
+              sits between systems, automation, product and interface design — with
+              a focus on keeping complicated things simple.
             </p>
           </div>
         </section>
