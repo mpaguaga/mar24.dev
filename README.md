@@ -1,3 +1,9 @@
-# mar24.dev
+# MAR24.DEV
 
-Minimal portfolio. Vercel: Vite / `npm run build` / `dist`.
+Minimal dark portfolio featuring the public StreamPulse project.
+
+Vercel:
+- Framework: Vite
+- Build Command: npm run build
+- Output Directory: dist
+- Install Command: npm install
