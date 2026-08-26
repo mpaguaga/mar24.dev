@@ -53,8 +53,25 @@ function CountUp({ end, suffix = "", plus = false }) {
   return <b ref={ref}>{val}{plus ? "+" : ""}{suffix}</b>;
 }
 
+const ArrowUpIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 19V5M5 12l7-7 7 7" />
+  </svg>
+);
+
 function App() {
   const [theme, setTheme] = useState("dark");
+  const [showTop, setShowTop] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Wire this to Formspree, Vercel serverless, etc. Placeholder = mailto fallback.
+    const body = encodeURIComponent(`From: ${form.name} (${form.email})\n\n${form.message}`);
+    window.location.href = `mailto:hello@mar24.dev?subject=Portfolio%20contact&body=${body}`;
+    setSent(true);
+  };
 
   // Apply + persist theme
   useEffect(() => {
@@ -96,6 +113,14 @@ function App() {
     return () => io.disconnect();
   }, []);
 
+  // Show "back to top" after scrolling down
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 500);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Magnetic buttons
   useEffect(() => {
     const magnets = document.querySelectorAll(".btn");
@@ -131,6 +156,7 @@ function App() {
         <nav className="nav">
           <a href="#work" className="navLink">Work</a>
           <a href="#about" className="navLink">About</a>
+          <a href="#contact" className="navLink">Contact</a>
           <a href="https://github.com/" className="navLink" target="_blank" rel="noreferrer">GitHub</a>
           <a href="mailto:hello@mar24.dev" className="contact">Contact<span>↗</span></a>
           <button
@@ -278,7 +304,74 @@ function App() {
             </p>
           </div>
         </section>
+        {/* Contact */}
+        <section className="contactSection" id="contact" data-reveal>
+          <div className="sectionHeader">
+            <span>Contact</span>
+            <span>Let's Talk</span>
+          </div>
+          <div className="contactGrid">
+            <div>
+              <h2>Have a project<br /><span>in mind?</span></h2>
+              <p className="contactBlurb">
+                Whether it's an idea, a problem to solve or a build you want to
+                ship — drop a message and I'll get back to you.
+              </p>
+              <a href="mailto:hello@mar24.dev" className="contactEmail">hello@mar24.dev ↗</a>
+            </div>
+
+            {sent ? (
+              <div className="formSent">
+                <div className="formSentIcon">✓</div>
+                <h3>Thanks — message ready to send!</h3>
+                <p>Your email app should have opened. If not, reach me directly at hello@mar24.dev.</p>
+              </div>
+            ) : (
+              <form className="contactForm" onSubmit={handleSubmit}>
+                <label>
+                  <span>Name</span>
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Your name"
+                  />
+                </label>
+                <label>
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="you@example.com"
+                  />
+                </label>
+                <label>
+                  <span>Message</span>
+                  <textarea
+                    required
+                    rows={4}
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    placeholder="Tell me about your project…"
+                  />
+                </label>
+                <button type="submit" className="formSubmit">Send message ↗</button>
+              </form>
+            )}
+          </div>
+        </section>
       </main>
+
+      <button
+        className={`toTop ${showTop ? "show" : ""}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Back to top"
+      >
+        <ArrowUpIcon />
+      </button>
 
       <footer className="footer">
         <span>© 2026 MAR24.DEV</span>
