@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
   --bg: #08090b;
@@ -22,7 +22,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: "Poppins", Inter, Arial, sans-serif;
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -460,7 +460,7 @@ a { color: inherit; text-decoration: none; }
   .nav a { display: none; }
   .main { width: calc(100% - 44px); }
   .intro { min-height: 440px; padding: 80px 0 60px; }
-  .intro h1 { font-size: clamp(48px, 15vw, 74px); letter-spacing: -2px; }
+  .intro h1 { font-size: clamp(48px, 15vw, 74px); letter-spacing: -1.5px; }
   .introText { font-size: 15px; }
   .projectCard { padding: 22px; }
   .projectContent {

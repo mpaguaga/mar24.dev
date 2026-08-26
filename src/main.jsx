@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -9,20 +9,6 @@ const GitHubIcon = () => (
 );
 
 function App() {
-  const appRef = useRef(null);
-
-  // Cursor spotlight glow that follows the mouse
-  useEffect(() => {
-    const el = appRef.current;
-    if (!el) return;
-    const move = (e) => {
-      el.style.setProperty("--mx", `${e.clientX}px`);
-      el.style.setProperty("--my", `${e.clientY}px`);
-    };
-    window.addEventListener("pointermove", move);
-    return () => window.removeEventListener("pointermove", move);
-  }, []);
-
   // Scroll progress bar
   useEffect(() => {
     const bar = document.querySelector(".progress");
@@ -54,9 +40,8 @@ function App() {
   }, []);
 
   return (
-    <div className="app" ref={appRef}>
+    <div className="app">
       <div className="progress" />
-      <div className="spotlight" />
       <div className="ambient ambientOne" />
       <div className="ambient ambientTwo" />
       <div className="grain" />
