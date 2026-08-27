@@ -277,8 +277,6 @@ function App() {
   return (
     <div className="app">
       <div className="progress" />
-      <div className="ambient ambientOne" />
-      <div className="ambient ambientTwo" />
       <div className="grain" />
 
       <header className="header">
@@ -456,10 +454,13 @@ function App() {
 
 /* Console greeting — a little hello for the curious devs who open DevTools */
 try {
-  const brand = "color:#a78bfa;font-weight:bold;font-size:13px";
-  const soft = "color:#85878c;font-size:12px";
-  console.log("%c\n  MAR24.DEV\n  Design. Build. Ship.\n", brand);
-  console.log("%cLike what you see under the hood? Let's talk → %chello@mar24.dev", soft, "color:#70c995;font-size:12px");
+  const brand = "color:#a78bfa;font-weight:bold;font-size:16px;line-height:1.5";
+  const soft = "color:#85878c;font-size:13px;line-height:1.6";
+  const mail = "color:#70c995;font-weight:bold;font-size:14px";
+  console.log(
+    "%cMAR24.DEV — Design. Build. Ship.\n\n%cLike what you see under the hood? Let's talk:\n%c📧 hello@mar24.dev\n",
+    brand, soft, mail
+  );
 } catch (e) { /* no-op */ }
 
 createRoot(document.getElementById("root")).render(<App />);
