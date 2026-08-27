@@ -270,6 +270,7 @@ function App() {
 
       <main className="main">
         <section className="intro">
+          <div className="mesh" />
           <span className="eyebrow reveal d1"><i className="statusDot" />Software · Systems · Product</span>
           <h1 className="reveal d2">Design.<br />Build.<br /><span className="shimmer">Ship.</span></h1>
           <p className="introText reveal d3">Software, automation and systems — engineered to be fast, clean and genuinely useful.</p>
@@ -293,6 +294,10 @@ function App() {
 
           <a className="projectCard" href="https://stream-pulse-beta.vercel.app/" target="_blank" rel="noreferrer">
             <div className="projectTop"><span className="projectNumber">01</span><span className="live"><i />Live</span></div>
+            <div className="projectPreview">
+              <img src="/streampulse.png" alt="StreamPulse dashboard preview" loading="lazy"
+                   onError={(e) => { e.currentTarget.style.display = "none"; }} />
+            </div>
             <div className="projectContent">
               <div>
                 <span className="projectMeta">SaaS · Streaming · React</span>
@@ -307,6 +312,10 @@ function App() {
 
           <a className="projectCard" href="https://github.com/" target="_blank" rel="noreferrer">
             <div className="projectTop"><span className="projectNumber">02</span><span className="live soon"><i />In Progress</span></div>
+            <div className="projectPreview">
+              <img src="/flowkit.png" alt="FlowKit dashboard preview" loading="lazy"
+                   onError={(e) => { e.currentTarget.style.display = "none"; }} />
+            </div>
             <div className="projectContent">
               <div>
                 <span className="projectMeta">Automation · Tooling · Node</span>
