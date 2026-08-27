@@ -216,6 +216,16 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  /* Close mobile menu on outside tap or Escape */
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDown = (e) => { if (!e.target.closest(".header")) setMenuOpen(false); };
+    const onEsc = (e) => { if (e.key === "Escape") setMenuOpen(false); };
+    document.addEventListener("pointerdown", onDown);
+    window.addEventListener("keydown", onEsc);
+    return () => { document.removeEventListener("pointerdown", onDown); window.removeEventListener("keydown", onEsc); };
+  }, [menuOpen]);
+
   /* Copy email */
   const copyEmail = async () => {
     try {
@@ -412,6 +422,23 @@ function App() {
 
       <button className={`toTop ${showTop ? "show" : ""}`} onClick={() => goto("top")} aria-label="Back to top"><ArrowUpIcon /></button>
 
+      {/* Section progress rail (desktop) */}
+      <div className="rail" aria-hidden="true">
+        {[
+          { id: "work", label: "Work" },
+          { id: "about", label: "About" },
+          { id: "contact", label: "Contact" },
+        ].map((s) => (
+          <button
+            key={s.id}
+            className={`railDot ${active === s.id ? "on" : ""}`}
+            onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <span className="railLabel">{s.label}</span>
+          </button>
+        ))}
+      </div>
+
       <CommandPalette open={cmdOpen} onClose={() => setCmdOpen(false)} actions={actions} />
 
       <div className={`toast ${toast ? "show" : ""}`}><b>✓</b>Email copied to clipboard</div>
@@ -426,5 +453,13 @@ function App() {
     </div>
   );
 }
+
+/* Console greeting — a little hello for the curious devs who open DevTools */
+try {
+  const brand = "color:#a78bfa;font-weight:bold;font-size:13px";
+  const soft = "color:#85878c;font-size:12px";
+  console.log("%c\n  MAR24.DEV\n  Design. Build. Ship.\n", brand);
+  console.log("%cLike what you see under the hood? Let's talk → %chello@mar24.dev", soft, "color:#70c995;font-size:12px");
+} catch (e) { /* no-op */ }
 
 createRoot(document.getElementById("root")).render(<App />);

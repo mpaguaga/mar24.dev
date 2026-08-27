@@ -428,6 +428,58 @@ a { color: inherit; text-decoration: none; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast b { color: #70c995; margin-right: 6px; }
 
+/* ---------- Section progress rail ---------- */
+.rail {
+  position: fixed;
+  left: 26px; top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  z-index: 30;
+}
+.railDot {
+  position: relative;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--line-hover);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: border-color .25s, background .25s, transform .25s;
+}
+.railDot::before {
+  content: "";
+  position: absolute; inset: -6px;
+}
+.railDot:hover { border-color: var(--accent); transform: scale(1.15); }
+.railDot.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(167,139,250,.6);
+}
+.railLabel {
+  position: absolute;
+  left: 20px; top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  white-space: nowrap;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--soft);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 9px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s, transform .22s;
+}
+.railDot:hover .railLabel { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+@media (max-width: 1080px) { .rail { display: none; } }
+
 /* ---------- Footer ---------- */
 .footer {
   border-top: 1px solid var(--line); min-height: 76px; padding: 0 6vw;
