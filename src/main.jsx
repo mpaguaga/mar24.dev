@@ -23,6 +23,8 @@ const HomeIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
 const MailIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>);
 const BriefcaseIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>);
 const UserIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>);
+const MenuIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>);
+const CloseIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>);
 
 const TECH = ["React", "Node.js", "Automation", "Azure", "Linux", "Python", "REST APIs", "Identity", "SharePoint", "CI/CD"];
 
@@ -130,6 +132,7 @@ function App() {
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   /* Theme persistence */
   useEffect(() => { const s = localStorage.getItem("mar24-theme"); if (s) setTheme(s); }, []);
@@ -147,13 +150,24 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Reveal on scroll */
+  /* Reveal on scroll — triggers early (rootMargin) so content never lags on mobile */
   useEffect(() => {
+    const nodes = Array.from(document.querySelectorAll("[data-reveal]"));
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach((n) => n.classList.add("inview"));
+      return;
+    }
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("inview"); io.unobserve(entry.target); } });
-    }, { threshold: 0.15 });
-    document.querySelectorAll("[data-reveal]").forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    }, { threshold: 0, rootMargin: "0px 0px -12% 0px" });
+    nodes.forEach((n) => {
+      // If it's already in/above the viewport on load, reveal immediately
+      if (n.getBoundingClientRect().top < window.innerHeight * 0.9) n.classList.add("inview");
+      else io.observe(n);
+    });
+    // Safety net: guarantee everything is visible shortly after load
+    const failsafe = setTimeout(() => nodes.forEach((n) => n.classList.add("inview")), 1200);
+    return () => { io.disconnect(); clearTimeout(failsafe); };
   }, []);
 
   /* Back-to-top + active section */
@@ -268,7 +282,17 @@ function App() {
           <button className="iconBtn themeToggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme">
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
+          <button className="iconBtn menuBtn" onClick={() => setMenuOpen((o) => !o)} aria-label="Menu">
+            {menuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
         </nav>
+
+        <div className={`mobileMenu ${menuOpen ? "open" : ""}`}>
+          <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
+          <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+          <a href="https://github.com/" target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}>GitHub ↗</a>
+        </div>
       </header>
 
       <main className="main">
