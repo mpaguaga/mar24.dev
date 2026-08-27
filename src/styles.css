@@ -304,6 +304,13 @@ a { color: inherit; text-decoration: none; }
 .copied { color: #70c995; }
 
 .contactForm { display: flex; flex-direction: column; gap: 18px; }
+/* Honeypot: visually and physically hidden, but present for bots to fill */
+.contactForm .hp {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px; height: 1px;
+  opacity: 0; pointer-events: none;
+}
 .contactForm label { display: flex; flex-direction: column; gap: 8px; }
 .contactForm label span { font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
 .contactForm input, .contactForm textarea {

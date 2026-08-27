@@ -125,6 +125,7 @@ function App() {
   const [showTop, setShowTop] = useState(false);
   const [active, setActive] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [botField, setBotField] = useState(""); // honeypot — real users never fill this
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState(false);
@@ -219,6 +220,8 @@ function App() {
   /* Form submit -> Formspree (graceful mailto fallback if not configured) */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Honeypot: if this hidden field is filled, it's a bot — silently pretend success.
+    if (botField) { setStatus("sent"); return; }
     if (FORMSPREE_ID === "YOUR_FORM_ID") {
       const body = encodeURIComponent(`From: ${form.name} (${form.email})\n\n${form.message}`);
       window.location.href = `mailto:${EMAIL}?subject=Portfolio%20contact&body=${body}`;
@@ -230,7 +233,7 @@ function App() {
       const res = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, _gotcha: botField }),
       });
       setStatus(res.ok ? "sent" : "error");
     } catch { setStatus("error"); }
@@ -354,6 +357,16 @@ function App() {
               </div>
             ) : (
               <form className="contactForm" onSubmit={handleSubmit}>
+                {/* Honeypot — hidden from humans, catches bots. Do not remove. */}
+                <input
+                  type="text"
+                  className="hp"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={botField}
+                  onChange={(e) => setBotField(e.target.value)}
+                />
                 <label><span>Name</span>
                   <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
                 </label>
