@@ -15,10 +15,10 @@ const GitHubIcon = () => (
 );
 const SunIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>);
 const MoonIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>);
-const ArrowUpIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>);
+const ArrowUpIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>);
 const HomeIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" /></svg>);
-const MailIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" /><path d="m3 7 9 6 9-6" /></svg>);
-const BriefcaseIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="7" width="18" height="13" rx="1" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>);
+const MailIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>);
+const BriefcaseIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>);
 const UserIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>);
 const MenuIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18" /></svg>);
 const CloseIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>);
@@ -37,7 +37,7 @@ function CountUp({ end, plus = false }) {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !started) {
           started = true;
-          const dur = 1400, t0 = performance.now();
+          const dur = 1300, t0 = performance.now();
           const tick = (now) => {
             const p = Math.min((now - t0) / dur, 1);
             setVal(Math.round((1 - Math.pow(1 - p, 3)) * end));
@@ -82,12 +82,9 @@ function CommandPalette({ open, onClose, actions }) {
   return (
     <div className="cmdkOverlay" onClick={onClose}>
       <div className="cmdk" onClick={(e) => e.stopPropagation()}>
-        <div className="cmdkTop">
-          <span className="cmdkPrompt">&gt;</span>
-          <input ref={inputRef} className="cmdkInput" placeholder="type a command…" value={q} onChange={(e) => setQ(e.target.value)} />
-        </div>
+        <input ref={inputRef} className="cmdkInput" placeholder="Search sections, links, actions…" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="cmdkList">
-          {filtered.length === 0 && <div className="cmdkEmpty">no matches for "{q}"</div>}
+          {filtered.length === 0 && <div className="cmdkEmpty">No results for "{q}"</div>}
           {filtered.map((a, i) => (
             <div
               key={a.label}
@@ -103,8 +100,8 @@ function CommandPalette({ open, onClose, actions }) {
           ))}
         </div>
         <div className="cmdkFoot">
-          <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
-          <span><kbd>↵</kbd> run</span>
+          <span><kbd>↑</kbd> <kbd>↓</kbd> navigate</span>
+          <span><kbd>↵</kbd> select</span>
           <span><kbd>esc</kbd> close</span>
         </div>
       </div>
@@ -117,21 +114,24 @@ function App() {
   const [showTop, setShowTop] = useState(false);
   const [active, setActive] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [botField, setBotField] = useState("");
-  const [status, setStatus] = useState("idle");
+  const [botField, setBotField] = useState(""); // honeypot
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  /* Always start at the top on refresh */
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
   }, []);
 
+  /* Theme persistence */
   useEffect(() => { const s = localStorage.getItem("mar24-theme"); if (s) setTheme(s); }, []);
   useEffect(() => { document.documentElement.setAttribute("data-theme", theme); localStorage.setItem("mar24-theme", theme); }, [theme]);
 
+  /* Scroll progress */
   useEffect(() => {
     const bar = document.querySelector(".progress");
     const onScroll = () => {
@@ -143,6 +143,7 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Reveal on scroll */
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll("[data-reveal]"));
     if (!("IntersectionObserver" in window)) { nodes.forEach((n) => n.classList.add("inview")); return; }
@@ -157,6 +158,7 @@ function App() {
     return () => { io.disconnect(); clearTimeout(failsafe); };
   }, []);
 
+  /* Back-to-top + active section */
   useEffect(() => {
     const onScroll = () => {
       setShowTop(window.scrollY > 500);
@@ -173,9 +175,10 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* Magnetic buttons */
   useEffect(() => {
     const magnets = document.querySelectorAll(".btn");
-    const strength = 20;
+    const strength = 22;
     const handlers = [];
     magnets.forEach((mag) => {
       const move = (e) => {
@@ -192,6 +195,7 @@ function App() {
     return () => handlers.forEach(({ mag, move, reset }) => { mag.removeEventListener("pointermove", move); mag.removeEventListener("pointerleave", reset); });
   }, []);
 
+  /* ⌘K / Ctrl+K to open palette */
   useEffect(() => {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setCmdOpen((o) => !o); }
@@ -200,6 +204,7 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  /* Close mobile menu on outside tap or Escape */
   useEffect(() => {
     if (!menuOpen) return;
     const onDown = (e) => { if (!e.target.closest(".header")) setMenuOpen(false); };
@@ -209,6 +214,7 @@ function App() {
     return () => { document.removeEventListener("pointerdown", onDown); window.removeEventListener("keydown", onEsc); };
   }, [menuOpen]);
 
+  /* Copy email */
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL);
@@ -223,9 +229,10 @@ function App() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  /* Form submit -> Formspree */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (botField) { setStatus("sent"); return; }
+    if (botField) { setStatus("sent"); return; } // honeypot caught a bot
     setStatus("sending");
     try {
       const res = await fetch(FORMSPREE_ENDPOINT, {
@@ -256,10 +263,10 @@ function App() {
       <header className="header">
         <a href="/" className="logo">MAR24<span>.DEV</span></a>
         <nav className="nav">
-          <a href="#work" className={`navLink ${active === "work" ? "active" : ""}`}><i>01</i>Work</a>
-          <a href="#about" className={`navLink ${active === "about" ? "active" : ""}`}><i>02</i>About</a>
-          <a href="#contact" className={`navLink ${active === "contact" ? "active" : ""}`}><i>03</i>Contact</a>
-          <a href="https://github.com/" className="navLink" target="_blank" rel="noreferrer"><i>↗</i>GitHub</a>
+          <a href="#work" className={`navLink ${active === "work" ? "active" : ""}`}>Work</a>
+          <a href="#about" className={`navLink ${active === "about" ? "active" : ""}`}>About</a>
+          <a href="#contact" className={`navLink ${active === "contact" ? "active" : ""}`}>Contact</a>
+          <a href="https://github.com/" className="navLink" target="_blank" rel="noreferrer">GitHub</a>
           <button className="kbdHint" onClick={() => setCmdOpen(true)} aria-label="Open command palette">⌘K</button>
           <button className="iconBtn themeToggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme">
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -270,25 +277,20 @@ function App() {
         </nav>
 
         <div className={`mobileMenu ${menuOpen ? "open" : ""}`}>
-          <a href="#work" onClick={() => setMenuOpen(false)}><i>01</i> Work</a>
-          <a href="#about" onClick={() => setMenuOpen(false)}><i>02</i> About</a>
-          <a href="#contact" onClick={() => setMenuOpen(false)}><i>03</i> Contact</a>
-          <a href="https://github.com/" target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}><i>↗</i> GitHub</a>
+          <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
+          <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+          <a href="https://github.com/" target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}>GitHub ↗</a>
         </div>
       </header>
 
       <main className="main">
         <section className="intro">
-          <span className="ghostYear" aria-hidden="true">’26</span>
-          <span className="eyebrow reveal d1"><i className="statusDot" />Software · Systems · Product — available for work</span>
-          <h1 className="reveal d2">
-            <span className="line">Design.</span>
-            <span className="line">Build.</span>
-            <span className="line"><span className="shimmer">Ship.</span></span>
-          </h1>
+          <span className="eyebrow reveal d1"><i className="statusDot" />Software · Systems · Product</span>
+          <h1 className="reveal d2">Design.<br />Build.<br /><span className="shimmer">Ship.</span></h1>
           <p className="introText reveal d3">Software, automation and systems — engineered to be fast, clean and genuinely useful.</p>
           <div className="introCtas reveal d4">
-            <a href="#work" className="btn btnPrimary">View work <span className="arr">→</span></a>
+            <a href="#work" className="btn btnPrimary">View work ↗</a>
             <button className="btn btnGhost" onClick={copyEmail}>{copied ? "Copied ✓" : "Copy email"}</button>
           </div>
         </section>
@@ -296,7 +298,7 @@ function App() {
 
       {/* Static tech stack */}
       <div className="techWrap reveal d5">
-        <span className="techLabel">// tech I build with</span>
+        <span className="techLabel">Tech I build with</span>
         <div className="techGrid">
           {TECH.map((t) => <span key={t} className="chip">{t}</span>)}
         </div>
@@ -304,15 +306,10 @@ function App() {
 
       <main className="main">
         <section className="work" id="work" data-reveal>
-          <div className="sectionHeader">
-            <span className="secIndex">(01)</span>
-            <span className="secTitle">Selected Work</span>
-            <span className="secMeta">02 projects</span>
-          </div>
+          <div className="sectionHeader"><span>Selected Work</span><span>01 / 02</span></div>
 
           <a className="projectCard" href="https://stream-pulse-beta.vercel.app/" target="_blank" rel="noreferrer">
-            <span className="cardBigNum" aria-hidden="true">01</span>
-            <div className="projectTop"><span className="projectNumber">STREAMPULSE</span><span className="live"><i />Live</span></div>
+            <div className="projectTop"><span className="projectNumber">01</span><span className="live"><i />Live</span></div>
             <div className="projectContent">
               <div>
                 <span className="projectMeta">SaaS · Streaming · React</span>
@@ -322,11 +319,11 @@ function App() {
               </div>
               <div className="projectAction">View project<strong>↗</strong></div>
             </div>
+            <div className="projectFooter"><span>Public Build</span><span>StreamPulse</span></div>
           </a>
 
           <a className="projectCard" href="https://github.com/" target="_blank" rel="noreferrer">
-            <span className="cardBigNum" aria-hidden="true">02</span>
-            <div className="projectTop"><span className="projectNumber">FLOWKIT</span><span className="live soon"><i />In Progress</span></div>
+            <div className="projectTop"><span className="projectNumber">02</span><span className="live soon"><i />In Progress</span></div>
             <div className="projectContent">
               <div>
                 <span className="projectMeta">Automation · Tooling · Node</span>
@@ -336,18 +333,15 @@ function App() {
               </div>
               <div className="projectAction">View project<strong>↗</strong></div>
             </div>
+            <div className="projectFooter"><span>Private Build</span><span>FlowKit</span></div>
           </a>
         </section>
 
         <section className="about" id="about" data-reveal>
-          <div className="sectionHeader">
-            <span className="secIndex">(02)</span>
-            <span className="secTitle">About</span>
-            <span className="secMeta">who I am</span>
-          </div>
+          <div className="sectionHeader"><span>About</span><span>Who I Am</span></div>
           <div className="aboutGrid">
             <div>
-              <h2>Simple ideas,<br /><span>well built.</span></h2>
+              <h2>Simple ideas.<br /><span>Well built.</span></h2>
               <div className="stats">
                 <div className="stat"><CountUp end={5} plus /><span>Years</span></div>
                 <div className="stat"><CountUp end={20} plus /><span>Projects</span></div>
@@ -359,11 +353,7 @@ function App() {
         </section>
 
         <section className="contactSection" id="contact" data-reveal>
-          <div className="sectionHeader">
-            <span className="secIndex">(03)</span>
-            <span className="secTitle">Contact</span>
-            <span className="secMeta">let's talk</span>
-          </div>
+          <div className="sectionHeader"><span>Contact</span><span>Let's Talk</span></div>
           <div className="contactGrid">
             <div>
               <h2>Have a project<br /><span>in mind?</span></h2>
@@ -381,6 +371,7 @@ function App() {
               </div>
             ) : (
               <form className="contactForm" onSubmit={handleSubmit}>
+                {/* Honeypot — hidden from humans, catches bots. Do not remove. */}
                 <input type="text" className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" value={botField} onChange={(e) => setBotField(e.target.value)} />
                 <label><span>Name</span>
                   <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
@@ -393,7 +384,7 @@ function App() {
                 </label>
                 {status === "error" && <span className="formError">Something went wrong. Please try again or email me directly.</span>}
                 <button type="submit" className="formSubmit" disabled={status === "sending"}>
-                  {status === "sending" ? "Sending…" : "Send message →"}
+                  {status === "sending" ? "Sending…" : "Send message ↗"}
                 </button>
               </form>
             )}
@@ -403,6 +394,7 @@ function App() {
 
       <button className={`toTop ${showTop ? "show" : ""}`} onClick={() => goto("top")} aria-label="Back to top"><ArrowUpIcon /></button>
 
+      {/* Section progress rail (desktop) */}
       <div className="rail" aria-hidden="true">
         {[{ id: "work", label: "Work" }, { id: "about", label: "About" }, { id: "contact", label: "Contact" }].map((s) => (
           <button key={s.id} className={`railDot ${active === s.id ? "on" : ""}`} onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}>
@@ -416,8 +408,7 @@ function App() {
       <div className={`toast ${toast ? "show" : ""}`}><b>✓</b>Email copied to clipboard</div>
 
       <footer className="footer">
-        <span>© 2026 — MAR24.DEV</span>
-        <span className="footMid">Design. Build. Ship.</span>
+        <span>© 2026 MAR24.DEV</span>
         <div>
           <a href="https://github.com/" target="_blank" rel="noreferrer"><GitHubIcon /> GitHub</a>
           <button className="contactEmail" onClick={copyEmail}>{EMAIL}</button>
@@ -429,11 +420,11 @@ function App() {
 
 /* Console greeting */
 try {
-  const brand = "color:#d8f34e;font-weight:bold;font-size:16px;line-height:1.5";
-  const soft = "color:#8f8c83;font-size:13px;line-height:1.6";
-  const mail = "color:#d8f34e;font-weight:bold;font-size:14px";
+  const brand = "color:#a78bfa;font-weight:bold;font-size:16px;line-height:1.5";
+  const soft = "color:#85878c;font-size:13px;line-height:1.6";
+  const mail = "color:#70c995;font-weight:bold;font-size:14px";
   console.log(
-    "%cMAR24.DEV — Design. Build. Ship.\n\n%cLike what you see under the hood? Let's talk:\n%c> hello@mar24.dev\n",
+    "%cMAR24.DEV — Design. Build. Ship.\n\n%cLike what you see under the hood? Let's talk:\n%c📧 hello@mar24.dev\n",
     brand, soft, mail
   );
 } catch (e) { /* no-op */ }
