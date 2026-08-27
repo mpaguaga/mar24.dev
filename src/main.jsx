@@ -59,11 +59,17 @@ function CommandPalette({ open, onClose, actions }) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const inputRef = useRef(null);
+  const itemRefs = useRef([]);
 
   const filtered = actions.filter((a) => a.label.toLowerCase().includes(q.toLowerCase()));
 
   useEffect(() => { if (open) { setQ(""); setSel(0); setTimeout(() => inputRef.current?.focus(), 30); } }, [open]);
   useEffect(() => { setSel(0); }, [q]);
+
+  // Keep the highlighted item visible as you arrow up/down
+  useEffect(() => {
+    itemRefs.current[sel]?.scrollIntoView({ block: "nearest" });
+  }, [sel]);
 
   useEffect(() => {
     if (!open) return;
@@ -93,6 +99,7 @@ function CommandPalette({ open, onClose, actions }) {
           {filtered.map((a, i) => (
             <div
               key={a.label}
+              ref={(el) => (itemRefs.current[i] = el)}
               className={`cmdkItem ${i === sel ? "sel" : ""}`}
               onMouseEnter={() => setSel(i)}
               onClick={() => { a.run(); onClose(); }}
