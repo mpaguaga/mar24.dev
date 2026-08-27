@@ -96,18 +96,6 @@ a { color: inherit; text-decoration: none; }
   .shimmer, .marqueeTrack { animation: none !important; }
 }
 
-/* Ambient glows */
-.ambient {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 50%;
-  filter: blur(110px);
-  z-index: 0;
-}
-
-
-
-
 .grain {
   position: fixed;
   inset: 0;
@@ -156,7 +144,6 @@ a { color: inherit; text-decoration: none; }
 .contact:hover { border-color: var(--accent); background: var(--accent-soft); }
 .contact span { color: var(--accent); margin-left: 7px; }
 
-/* Small square icon buttons in header */
 .iconBtn {
   width: 34px; height: 34px; display: grid; place-items: center;
   border: 1px solid var(--line-hover); border-radius: 8px; background: transparent;
@@ -247,12 +234,12 @@ a { color: inherit; text-decoration: none; }
 .introCtas { margin-top: 38px; display: flex; gap: 14px; flex-wrap: wrap; }
 .btn {
   display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600;
-  padding: 12px 20px; border-radius: 10px;
+  padding: 12px 20px; border-radius: 10px; cursor: pointer;
   transition: transform .18s ease-out, background .2s, border-color .2s; will-change: transform;
 }
-.btnPrimary { background: var(--accent); color: #14101f; }
+.btnPrimary { background: var(--accent); color: #14101f; border: none; }
 .btnPrimary:hover { background: #b9a3ff; }
-.btnGhost { border: 1px solid var(--line-hover); color: var(--soft); }
+.btnGhost { border: 1px solid var(--line-hover); color: var(--soft); background: transparent; }
 .btnGhost:hover { border-color: var(--accent); color: var(--text); }
 
 /* ---------- Marquee ---------- */
@@ -339,12 +326,10 @@ a { color: inherit; text-decoration: none; }
 .copied { color: #70c995; }
 
 .contactForm { display: flex; flex-direction: column; gap: 18px; }
-/* Honeypot: visually and physically hidden, but present for bots to fill */
+/* Honeypot: visually and physically hidden, but present for bots */
 .contactForm .hp {
-  position: absolute !important;
-  left: -9999px !important;
-  width: 1px; height: 1px;
-  opacity: 0; pointer-events: none;
+  position: absolute !important; left: -9999px !important;
+  width: 1px; height: 1px; opacity: 0; pointer-events: none;
 }
 .contactForm label { display: flex; flex-direction: column; gap: 8px; }
 .contactForm label span { font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
@@ -429,54 +414,26 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- Section progress rail ---------- */
 .rail {
-  position: fixed;
-  left: 26px; top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  z-index: 30;
+  position: fixed; left: 26px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 18px; z-index: 30;
 }
 .railDot {
-  position: relative;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  border: 1px solid var(--line-hover);
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
+  position: relative; width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid var(--line-hover); background: transparent; padding: 0; cursor: pointer;
   transition: border-color .25s, background .25s, transform .25s;
 }
-.railDot::before {
-  content: "";
-  position: absolute; inset: -6px;
-}
+.railDot::before { content: ""; position: absolute; inset: -6px; }
 .railDot:hover { border-color: var(--accent); transform: scale(1.15); }
-.railDot.on {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(167,139,250,.6);
-}
+.railDot.on { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px rgba(167,139,250,.6); }
 .railLabel {
-  position: absolute;
-  left: 20px; top: 50%;
-  transform: translateY(-50%) translateX(-6px);
-  white-space: nowrap;
-  font-family: "DM Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--soft);
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 4px 9px;
-  opacity: 0;
-  pointer-events: none;
+  position: absolute; left: 20px; top: 50%; transform: translateY(-50%) translateX(-6px);
+  white-space: nowrap; font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--soft);
+  background: color-mix(in srgb, var(--bg) 90%, transparent); border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px 9px; opacity: 0; pointer-events: none;
   transition: opacity .22s, transform .22s;
 }
 .railDot:hover .railLabel { opacity: 1; transform: translateY(-50%) translateX(0); }
-
 @media (max-width: 1080px) { .rail { display: none; } }
 
 /* ---------- Footer ---------- */
@@ -486,8 +443,8 @@ a { color: inherit; text-decoration: none; }
   font: 500 10px "DM Mono"; letter-spacing: 1px; position: relative; z-index: 1;
 }
 .footer div { display: flex; align-items: center; gap: 25px; }
-.footer a { display: flex; align-items: center; gap: 7px; color: var(--muted); transition: color .2s; }
-.footer a:hover { color: var(--text); }
+.footer a, .footer button { display: flex; align-items: center; gap: 7px; color: var(--muted); transition: color .2s; background: none; border: none; cursor: pointer; font: inherit; }
+.footer a:hover, .footer button:hover { color: var(--text); }
 .footer svg { width: 14px; height: 14px; fill: currentColor; }
 
 /* ---------- Responsive ---------- */

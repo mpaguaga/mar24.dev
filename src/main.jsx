@@ -4,8 +4,6 @@ import "./styles.css";
 
 /* ====== CONFIG ====== */
 const EMAIL = "hello@mar24.dev";
-// 1) Sign up free at https://formspree.io  2) Create a form  3) paste your ID below.
-//    e.g. "xldbnqwe"  ->  endpoint becomes https://formspree.io/f/xldbnqwe
 const FORMSPREE_ID = "xeaqjzak";
 const FORMSPREE_ENDPOINT = `https://formspree.io/f/${FORMSPREE_ID}`;
 
@@ -18,7 +16,6 @@ const GitHubIcon = () => (
 const SunIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>);
 const MoonIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>);
 const ArrowUpIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>);
-const SearchIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m21 21-3.5-3.5" /></svg>);
 const HomeIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" /></svg>);
 const MailIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>);
 const BriefcaseIcon = () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>);
@@ -67,11 +64,7 @@ function CommandPalette({ open, onClose, actions }) {
 
   useEffect(() => { if (open) { setQ(""); setSel(0); setTimeout(() => inputRef.current?.focus(), 30); } }, [open]);
   useEffect(() => { setSel(0); }, [q]);
-
-  // Keep the highlighted item visible as you arrow up/down
-  useEffect(() => {
-    itemRefs.current[sel]?.scrollIntoView({ block: "nearest" });
-  }, [sel]);
+  useEffect(() => { itemRefs.current[sel]?.scrollIntoView({ block: "nearest" }); }, [sel]);
 
   useEffect(() => {
     if (!open) return;
@@ -89,13 +82,7 @@ function CommandPalette({ open, onClose, actions }) {
   return (
     <div className="cmdkOverlay" onClick={onClose}>
       <div className="cmdk" onClick={(e) => e.stopPropagation()}>
-        <input
-          ref={inputRef}
-          className="cmdkInput"
-          placeholder="Search sections, links, actions…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
+        <input ref={inputRef} className="cmdkInput" placeholder="Search sections, links, actions…" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="cmdkList">
           {filtered.length === 0 && <div className="cmdkEmpty">No results for "{q}"</div>}
           {filtered.map((a, i) => (
@@ -127,12 +114,18 @@ function App() {
   const [showTop, setShowTop] = useState(false);
   const [active, setActive] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [botField, setBotField] = useState(""); // honeypot — real users never fill this
+  const [botField, setBotField] = useState(""); // honeypot
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /* Always start at the top on refresh (disable browser scroll restoration) */
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  }, []);
 
   /* Theme persistence */
   useEffect(() => { const s = localStorage.getItem("mar24-theme"); if (s) setTheme(s); }, []);
@@ -150,22 +143,17 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Reveal on scroll — triggers early (rootMargin) so content never lags on mobile */
+  /* Reveal on scroll — triggers early so content never lags on mobile */
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll("[data-reveal]"));
-    if (!("IntersectionObserver" in window)) {
-      nodes.forEach((n) => n.classList.add("inview"));
-      return;
-    }
+    if (!("IntersectionObserver" in window)) { nodes.forEach((n) => n.classList.add("inview")); return; }
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("inview"); io.unobserve(entry.target); } });
     }, { threshold: 0, rootMargin: "0px 0px -12% 0px" });
     nodes.forEach((n) => {
-      // If it's already in/above the viewport on load, reveal immediately
       if (n.getBoundingClientRect().top < window.innerHeight * 0.9) n.classList.add("inview");
       else io.observe(n);
     });
-    // Safety net: guarantee everything is visible shortly after load
     const failsafe = setTimeout(() => nodes.forEach((n) => n.classList.add("inview")), 1200);
     return () => { io.disconnect(); clearTimeout(failsafe); };
   }, []);
@@ -241,17 +229,10 @@ function App() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  /* Form submit -> Formspree (graceful mailto fallback if not configured) */
+  /* Form submit -> Formspree */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Honeypot: if this hidden field is filled, it's a bot — silently pretend success.
-    if (botField) { setStatus("sent"); return; }
-    if (FORMSPREE_ID === "YOUR_FORM_ID") {
-      const body = encodeURIComponent(`From: ${form.name} (${form.email})\n\n${form.message}`);
-      window.location.href = `mailto:${EMAIL}?subject=Portfolio%20contact&body=${body}`;
-      setStatus("sent");
-      return;
-    }
+    if (botField) { setStatus("sent"); return; } // honeypot caught a bot
     setStatus("sending");
     try {
       const res = await fetch(FORMSPREE_ENDPOINT, {
@@ -390,15 +371,7 @@ function App() {
             ) : (
               <form className="contactForm" onSubmit={handleSubmit}>
                 {/* Honeypot — hidden from humans, catches bots. Do not remove. */}
-                <input
-                  type="text"
-                  className="hp"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  value={botField}
-                  onChange={(e) => setBotField(e.target.value)}
-                />
+                <input type="text" className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" value={botField} onChange={(e) => setBotField(e.target.value)} />
                 <label><span>Name</span>
                   <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
                 </label>
@@ -422,16 +395,8 @@ function App() {
 
       {/* Section progress rail (desktop) */}
       <div className="rail" aria-hidden="true">
-        {[
-          { id: "work", label: "Work" },
-          { id: "about", label: "About" },
-          { id: "contact", label: "Contact" },
-        ].map((s) => (
-          <button
-            key={s.id}
-            className={`railDot ${active === s.id ? "on" : ""}`}
-            onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}
-          >
+        {[{ id: "work", label: "Work" }, { id: "about", label: "About" }, { id: "contact", label: "Contact" }].map((s) => (
+          <button key={s.id} className={`railDot ${active === s.id ? "on" : ""}`} onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}>
             <span className="railLabel">{s.label}</span>
           </button>
         ))}
