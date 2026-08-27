@@ -296,15 +296,11 @@ function App() {
         </section>
       </main>
 
-      {/* Seamless tech strip */}
-      <div className="marquee reveal d5">
-        <div className="marqueeTrack">
-          <div className="marqueeGroup">
-            {TECH.map((t) => <span key={t} className="chip">{t}</span>)}
-          </div>
-          <div className="marqueeGroup" aria-hidden="true">
-            {TECH.map((t) => <span key={t + "-dup"} className="chip">{t}</span>)}
-          </div>
+      {/* Static tech stack */}
+      <div className="techWrap reveal d5">
+        <span className="techLabel">Tech I build with</span>
+        <div className="techGrid">
+          {TECH.map((t) => <span key={t} className="chip">{t}</span>)}
         </div>
       </div>
 
