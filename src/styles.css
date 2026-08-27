@@ -242,21 +242,45 @@ a { color: inherit; text-decoration: none; }
 .btnGhost { border: 1px solid var(--line-hover); color: var(--soft); background: transparent; }
 .btnGhost:hover { border-color: var(--accent); color: var(--text); }
 
-/* ---------- Marquee ---------- */
+/* ---------- Tech strip (seamless) ---------- */
 .marquee {
-  margin-top: 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-  overflow: hidden; padding: 18px 0;
-  -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
-  mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  padding: 16px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
 }
-.marqueeTrack { display: flex; gap: 44px; width: max-content; animation: marqueeMove 26s linear infinite; }
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: marqueeMove 38s linear infinite;
+}
 .marquee:hover .marqueeTrack { animation-play-state: paused; }
-.marqueeTrack span {
-  font-family: "DM Mono", monospace; font-size: 13px; letter-spacing: 1px; color: var(--muted);
-  display: inline-flex; align-items: center; gap: 44px; white-space: nowrap;
+.marqueeGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 12px; /* keeps spacing uniform across the loop seam */
 }
-.marqueeTrack span::after { content: "•"; color: var(--accent); opacity: .55; }
-@keyframes marqueeMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.chip {
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  letter-spacing: .5px;
+  color: var(--soft);
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 7px 15px;
+  background: linear-gradient(135deg, var(--card-grad-a), var(--card-grad-b));
+  transition: border-color .2s, color .2s;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+@keyframes marqueeMove {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
 
 /* ---------- Work ---------- */
 .work { padding: 60px 0 100px; }
@@ -326,7 +350,6 @@ a { color: inherit; text-decoration: none; }
 .copied { color: #70c995; }
 
 .contactForm { display: flex; flex-direction: column; gap: 18px; }
-/* Honeypot: visually and physically hidden, but present for bots */
 .contactForm .hp {
   position: absolute !important; left: -9999px !important;
   width: 1px; height: 1px; opacity: 0; pointer-events: none;

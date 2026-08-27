@@ -121,7 +121,7 @@ function App() {
   const [cmdOpen, setCmdOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* Always start at the top on refresh (disable browser scroll restoration) */
+  /* Always start at the top on refresh */
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
@@ -143,7 +143,7 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Reveal on scroll — triggers early so content never lags on mobile */
+  /* Reveal on scroll */
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll("[data-reveal]"));
     if (!("IntersectionObserver" in window)) { nodes.forEach((n) => n.classList.add("inview")); return; }
@@ -296,10 +296,15 @@ function App() {
         </section>
       </main>
 
+      {/* Seamless tech strip */}
       <div className="marquee reveal d5">
         <div className="marqueeTrack">
-          <span>{TECH.join(" ")}</span>
-          <span>{TECH.join(" ")}</span>
+          <div className="marqueeGroup">
+            {TECH.map((t) => <span key={t} className="chip">{t}</span>)}
+          </div>
+          <div className="marqueeGroup" aria-hidden="true">
+            {TECH.map((t) => <span key={t + "-dup"} className="chip">{t}</span>)}
+          </div>
         </div>
       </div>
 
@@ -417,7 +422,7 @@ function App() {
   );
 }
 
-/* Console greeting — a little hello for the curious devs who open DevTools */
+/* Console greeting */
 try {
   const brand = "color:#a78bfa;font-weight:bold;font-size:16px;line-height:1.5";
   const soft = "color:#85878c;font-size:13px;line-height:1.6";
