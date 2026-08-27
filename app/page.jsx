@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
-import { createRoot } from "react-dom/client";
-import "./styles.css";
+"use client";
+
+import { useEffect, useState, useRef } from "react";
 
 /* ====== CONFIG ====== */
 const EMAIL = "hello@mar24.dev";
@@ -37,7 +37,7 @@ function CountUp({ end, plus = false }) {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !started) {
           started = true;
-          const dur = 1300, t0 = performance.now();
+          const dur = 1400, t0 = performance.now();
           const tick = (now) => {
             const p = Math.min((now - t0) / dur, 1);
             setVal(Math.round((1 - Math.pow(1 - p, 3)) * end));
@@ -82,9 +82,12 @@ function CommandPalette({ open, onClose, actions }) {
   return (
     <div className="cmdkOverlay" onClick={onClose}>
       <div className="cmdk" onClick={(e) => e.stopPropagation()}>
-        <input ref={inputRef} className="cmdkInput" placeholder="Search sections, links, actions…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="cmdkTop">
+          <span className="cmdkPrompt">&gt;_</span>
+          <input ref={inputRef} className="cmdkInput" placeholder="type a command" value={q} onChange={(e) => setQ(e.target.value)} />
+        </div>
         <div className="cmdkList">
-          {filtered.length === 0 && <div className="cmdkEmpty">No results for "{q}"</div>}
+          {filtered.length === 0 && <div className="cmdkEmpty">no matches for &ldquo;{q}&rdquo;</div>}
           {filtered.map((a, i) => (
             <div
               key={a.label}
@@ -100,8 +103,8 @@ function CommandPalette({ open, onClose, actions }) {
           ))}
         </div>
         <div className="cmdkFoot">
-          <span><kbd>↑</kbd> <kbd>↓</kbd> navigate</span>
-          <span><kbd>↵</kbd> select</span>
+          <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
+          <span><kbd>↵</kbd> run</span>
           <span><kbd>esc</kbd> close</span>
         </div>
       </div>
@@ -109,29 +112,26 @@ function CommandPalette({ open, onClose, actions }) {
   );
 }
 
-function App() {
+export default function Page() {
   const [theme, setTheme] = useState("dark");
   const [showTop, setShowTop] = useState(false);
   const [active, setActive] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [botField, setBotField] = useState(""); // honeypot
-  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [botField, setBotField] = useState("");
+  const [status, setStatus] = useState("idle");
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* Always start at the top on refresh */
   useEffect(() => {
     if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
   }, []);
 
-  /* Theme persistence */
   useEffect(() => { const s = localStorage.getItem("mar24-theme"); if (s) setTheme(s); }, []);
   useEffect(() => { document.documentElement.setAttribute("data-theme", theme); localStorage.setItem("mar24-theme", theme); }, [theme]);
 
-  /* Scroll progress */
   useEffect(() => {
     const bar = document.querySelector(".progress");
     const onScroll = () => {
@@ -143,7 +143,6 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Reveal on scroll */
   useEffect(() => {
     const nodes = Array.from(document.querySelectorAll("[data-reveal]"));
     if (!("IntersectionObserver" in window)) { nodes.forEach((n) => n.classList.add("inview")); return; }
@@ -158,7 +157,6 @@ function App() {
     return () => { io.disconnect(); clearTimeout(failsafe); };
   }, []);
 
-  /* Back-to-top + active section */
   useEffect(() => {
     const onScroll = () => {
       setShowTop(window.scrollY > 500);
@@ -175,10 +173,9 @@ function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Magnetic buttons */
   useEffect(() => {
     const magnets = document.querySelectorAll(".btn");
-    const strength = 22;
+    const strength = 20;
     const handlers = [];
     magnets.forEach((mag) => {
       const move = (e) => {
@@ -195,7 +192,6 @@ function App() {
     return () => handlers.forEach(({ mag, move, reset }) => { mag.removeEventListener("pointermove", move); mag.removeEventListener("pointerleave", reset); });
   }, []);
 
-  /* ⌘K / Ctrl+K to open palette */
   useEffect(() => {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setCmdOpen((o) => !o); }
@@ -204,7 +200,6 @@ function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  /* Close mobile menu on outside tap or Escape */
   useEffect(() => {
     if (!menuOpen) return;
     const onDown = (e) => { if (!e.target.closest(".header")) setMenuOpen(false); };
@@ -214,7 +209,16 @@ function App() {
     return () => { document.removeEventListener("pointerdown", onDown); window.removeEventListener("keydown", onEsc); };
   }, [menuOpen]);
 
-  /* Copy email */
+  useEffect(() => {
+    const brand = "color:#f5b13d;font-weight:bold;font-size:16px;line-height:1.5";
+    const soft = "color:#8a8579;font-size:13px;line-height:1.6";
+    const mail = "color:#f5b13d;font-weight:bold;font-size:14px";
+    console.log(
+      "%cMAR24.DEV — Design. Build. Ship.\n\n%cCurious under the hood? Let's talk:\n%c> hello@mar24.dev\n",
+      brand, soft, mail
+    );
+  }, []);
+
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL);
@@ -229,10 +233,9 @@ function App() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
-  /* Form submit -> Formspree */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (botField) { setStatus("sent"); return; } // honeypot caught a bot
+    if (botField) { setStatus("sent"); return; }
     setStatus("sending");
     try {
       const res = await fetch(FORMSPREE_ENDPOINT, {
@@ -247,7 +250,7 @@ function App() {
   const actions = [
     { label: "Go to top", hint: "nav", icon: <HomeIcon />, run: () => goto("top") },
     { label: "View Work", hint: "nav", icon: <BriefcaseIcon />, run: () => goto("work") },
-    { label: "About me", hint: "nav", icon: <UserIcon />, run: () => goto("about") },
+    { label: "About", hint: "nav", icon: <UserIcon />, run: () => goto("about") },
     { label: "Contact", hint: "nav", icon: <MailIcon />, run: () => goto("contact") },
     { label: "Copy email address", hint: "action", icon: <MailIcon />, run: copyEmail },
     { label: "Toggle light / dark", hint: "theme", icon: theme === "dark" ? <SunIcon /> : <MoonIcon />, run: () => setTheme(theme === "dark" ? "light" : "dark") },
@@ -259,14 +262,18 @@ function App() {
     <div className="app">
       <div className="progress" />
       <div className="grain" />
+      <div className="scan" aria-hidden="true" />
 
       <header className="header">
-        <a href="/" className="logo">MAR24<span>.DEV</span></a>
+        <div className="hLeft">
+          <a href="/" className="logo">MAR24<span>.DEV</span></a>
+          <span className="avail"><i />available for work</span>
+        </div>
         <nav className="nav">
-          <a href="#work" className={`navLink ${active === "work" ? "active" : ""}`}>Work</a>
-          <a href="#about" className={`navLink ${active === "about" ? "active" : ""}`}>About</a>
-          <a href="#contact" className={`navLink ${active === "contact" ? "active" : ""}`}>Contact</a>
-          <a href="https://github.com/" className="navLink" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="#work" className={`navLink ${active === "work" ? "active" : ""}`}><em>01</em>Work</a>
+          <a href="#about" className={`navLink ${active === "about" ? "active" : ""}`}><em>02</em>About</a>
+          <a href="#contact" className={`navLink ${active === "contact" ? "active" : ""}`}><em>03</em>Contact</a>
+          <a href="https://github.com/" className="navLink" target="_blank" rel="noreferrer"><em>↗</em>GitHub</a>
           <button className="kbdHint" onClick={() => setCmdOpen(true)} aria-label="Open command palette">⌘K</button>
           <button className="iconBtn themeToggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label="Toggle theme">
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
@@ -277,20 +284,23 @@ function App() {
         </nav>
 
         <div className={`mobileMenu ${menuOpen ? "open" : ""}`}>
-          <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
-          <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
-          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
-          <a href="https://github.com/" target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}>GitHub ↗</a>
+          <a href="#work" onClick={() => setMenuOpen(false)}><em>01</em> Work</a>
+          <a href="#about" onClick={() => setMenuOpen(false)}><em>02</em> About</a>
+          <a href="#contact" onClick={() => setMenuOpen(false)}><em>03</em> Contact</a>
+          <a href="https://github.com/" target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}><em>↗</em> GitHub</a>
         </div>
       </header>
 
       <main className="main">
         <section className="intro">
-          <span className="eyebrow reveal d1"><i className="statusDot" />Software · Systems · Product</span>
-          <h1 className="reveal d2">Design.<br />Build.<br /><span className="shimmer">Ship.</span></h1>
-          <p className="introText reveal d3">Software, automation and systems — engineered to be fast, clean and genuinely useful.</p>
-          <div className="introCtas reveal d4">
-            <a href="#work" className="btn btnPrimary">View work ↗</a>
+          <span className="introTag reveal d1">MAR24 — INDEX ’26</span>
+          <h1 className="hero">
+            <span className="line reveal d2">Design.</span>
+            <span className="line reveal d3">Build.</span>
+            <span className="line reveal d4"><span className="mark">Ship.</span></span>
+          </h1>
+          <div className="introCtas reveal d5">
+            <a href="#work" className="btn btnPrimary">View work <span className="arr">→</span></a>
             <button className="btn btnGhost" onClick={copyEmail}>{copied ? "Copied ✓" : "Copy email"}</button>
           </div>
         </section>
@@ -298,7 +308,7 @@ function App() {
 
       {/* Static tech stack */}
       <div className="techWrap reveal d5">
-        <span className="techLabel">Tech I build with</span>
+        <span className="techLabel">/ stack</span>
         <div className="techGrid">
           {TECH.map((t) => <span key={t} className="chip">{t}</span>)}
         </div>
@@ -306,10 +316,15 @@ function App() {
 
       <main className="main">
         <section className="work" id="work" data-reveal>
-          <div className="sectionHeader"><span>Selected Work</span><span>01 / 02</span></div>
+          <div className="sectionHeader">
+            <span className="secIndex">(01)</span>
+            <span className="secTitle">Selected Work</span>
+            <span className="secMeta">02 — projects</span>
+          </div>
 
           <a className="projectCard" href="https://stream-pulse-beta.vercel.app/" target="_blank" rel="noreferrer">
-            <div className="projectTop"><span className="projectNumber">01</span><span className="live"><i />Live</span></div>
+            <span className="cardBigNum" aria-hidden="true">01</span>
+            <div className="projectTop"><span className="projectNumber">STREAMPULSE</span><span className="live"><i />Live</span></div>
             <div className="projectContent">
               <div>
                 <span className="projectMeta">SaaS · Streaming · React</span>
@@ -319,11 +334,11 @@ function App() {
               </div>
               <div className="projectAction">View project<strong>↗</strong></div>
             </div>
-            <div className="projectFooter"><span>Public Build</span><span>StreamPulse</span></div>
           </a>
 
           <a className="projectCard" href="https://github.com/" target="_blank" rel="noreferrer">
-            <div className="projectTop"><span className="projectNumber">02</span><span className="live soon"><i />In Progress</span></div>
+            <span className="cardBigNum" aria-hidden="true">02</span>
+            <div className="projectTop"><span className="projectNumber">FLOWKIT</span><span className="live soon"><i />In Progress</span></div>
             <div className="projectContent">
               <div>
                 <span className="projectMeta">Automation · Tooling · Node</span>
@@ -333,31 +348,40 @@ function App() {
               </div>
               <div className="projectAction">View project<strong>↗</strong></div>
             </div>
-            <div className="projectFooter"><span>Private Build</span><span>FlowKit</span></div>
           </a>
         </section>
 
         <section className="about" id="about" data-reveal>
-          <div className="sectionHeader"><span>About</span><span>Who I Am</span></div>
+          <div className="sectionHeader">
+            <span className="secIndex">(02)</span>
+            <span className="secTitle">About</span>
+            <span className="secMeta">profile</span>
+          </div>
           <div className="aboutGrid">
-            <div>
-              <h2>Simple ideas.<br /><span>Well built.</span></h2>
-              <div className="stats">
-                <div className="stat"><CountUp end={5} plus /><span>Years</span></div>
-                <div className="stat"><CountUp end={20} plus /><span>Projects</span></div>
-                <div className="stat"><b>∞</b><span>Curiosity</span></div>
-              </div>
-            </div>
-            <p>I enjoy turning ideas into software people can actually use. My work sits between systems, automation, product and interface design — with a focus on keeping complicated things simple.</p>
+            <h2 className="aboutHead">Simple ideas,<br /><span>well built.</span></h2>
+            <dl className="infoList">
+              <div><dt>Role</dt><dd>Systems &amp; Automation Engineer</dd></div>
+              <div><dt>Focus</dt><dd>Identity · Tooling · Product</dd></div>
+              <div><dt>Base</dt><dd>Sonoma County, CA</dd></div>
+              <div><dt>Status</dt><dd><span className="dot" />Available for work</dd></div>
+            </dl>
+          </div>
+          <div className="stats">
+            <div className="stat"><CountUp end={5} plus /><span>Years</span></div>
+            <div className="stat"><CountUp end={20} plus /><span>Projects</span></div>
+            <div className="stat"><b>∞</b><span>Curiosity</span></div>
           </div>
         </section>
 
         <section className="contactSection" id="contact" data-reveal>
-          <div className="sectionHeader"><span>Contact</span><span>Let's Talk</span></div>
+          <div className="sectionHeader">
+            <span className="secIndex">(03)</span>
+            <span className="secTitle">Contact</span>
+            <span className="secMeta">let&rsquo;s talk</span>
+          </div>
           <div className="contactGrid">
-            <div>
-              <h2>Have a project<br /><span>in mind?</span></h2>
-              <p className="contactBlurb">Whether it's an idea, a problem to solve or a build you want to ship — drop a message and I'll get back to you.</p>
+            <div className="contactLeft">
+              <h2 className="contactHead">Have a project<br /><span>in mind?</span></h2>
               <button className={`contactEmail ${copied ? "copied" : ""}`} onClick={copyEmail}>
                 {copied ? "Copied ✓" : `${EMAIL} ⧉`}
               </button>
@@ -366,12 +390,11 @@ function App() {
             {status === "sent" ? (
               <div className="formSent">
                 <div className="formSentIcon">✓</div>
-                <h3>Thanks — message sent!</h3>
-                <p>I'll get back to you soon. You can also reach me directly at {EMAIL}.</p>
+                <h3>Message sent</h3>
+                <p>I&rsquo;ll get back to you soon — or reach me directly at {EMAIL}.</p>
               </div>
             ) : (
               <form className="contactForm" onSubmit={handleSubmit}>
-                {/* Honeypot — hidden from humans, catches bots. Do not remove. */}
                 <input type="text" className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" value={botField} onChange={(e) => setBotField(e.target.value)} />
                 <label><span>Name</span>
                   <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" />
@@ -380,11 +403,11 @@ function App() {
                   <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" />
                 </label>
                 <label><span>Message</span>
-                  <textarea required rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tell me about your project…" />
+                  <textarea required rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="A few words about it…" />
                 </label>
-                {status === "error" && <span className="formError">Something went wrong. Please try again or email me directly.</span>}
+                {status === "error" && <span className="formError">Something went wrong. Try again or email me directly.</span>}
                 <button type="submit" className="formSubmit" disabled={status === "sending"}>
-                  {status === "sending" ? "Sending…" : "Send message ↗"}
+                  {status === "sending" ? "Sending…" : "Send message →"}
                 </button>
               </form>
             )}
@@ -394,7 +417,6 @@ function App() {
 
       <button className={`toTop ${showTop ? "show" : ""}`} onClick={() => goto("top")} aria-label="Back to top"><ArrowUpIcon /></button>
 
-      {/* Section progress rail (desktop) */}
       <div className="rail" aria-hidden="true">
         {[{ id: "work", label: "Work" }, { id: "about", label: "About" }, { id: "contact", label: "Contact" }].map((s) => (
           <button key={s.id} className={`railDot ${active === s.id ? "on" : ""}`} onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}>
@@ -408,7 +430,8 @@ function App() {
       <div className={`toast ${toast ? "show" : ""}`}><b>✓</b>Email copied to clipboard</div>
 
       <footer className="footer">
-        <span>© 2026 MAR24.DEV</span>
+        <span>© 2026 — MAR24.DEV</span>
+        <span className="footMid">Design. Build. Ship.</span>
         <div>
           <a href="https://github.com/" target="_blank" rel="noreferrer"><GitHubIcon /> GitHub</a>
           <button className="contactEmail" onClick={copyEmail}>{EMAIL}</button>
@@ -417,16 +440,3 @@ function App() {
     </div>
   );
 }
-
-/* Console greeting */
-try {
-  const brand = "color:#a78bfa;font-weight:bold;font-size:16px;line-height:1.5";
-  const soft = "color:#85878c;font-size:13px;line-height:1.6";
-  const mail = "color:#70c995;font-weight:bold;font-size:14px";
-  console.log(
-    "%cMAR24.DEV — Design. Build. Ship.\n\n%cLike what you see under the hood? Let's talk:\n%c📧 hello@mar24.dev\n",
-    brand, soft, mail
-  );
-} catch (e) { /* no-op */ }
-
-createRoot(document.getElementById("root")).render(<App />);
